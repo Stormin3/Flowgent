@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Google AI Studio App</title>
+    <script>
+      // Defensive script to prevent "Cannot redefine property: ethereum" errors
+      // commonly caused by multiple browser extensions (e.g., MetaMask, Coinbase Wallet)
+      // fighting over the same property in an iframe environment.
+      (function() {
+        try {
+          if (!window.ethereum) {
+            Object.defineProperty(window, 'ethereum', {
+              value: undefined,
+              writable: true,
+              configurable: true
+            });
+          }
+        } catch (e) {
+          // If it's already defined and non-configurable, we just ignore it
+          // to prevent an uncaught exception.
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

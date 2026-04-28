@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - uid: string (required)
+    //   - email: string (required, format: email)
+    //   - displayName: string
+    //   - photoURL: string
+    //   - createdAt: string (format: date-time)
+    //
+    // Collection: workflows
+    // Document ID: {workflowId}
+    // Fields:
+    //   - id: string (required)
+    //   - userId: string (required)
+    //   - name: string (required)
+    //   - description: string
+    //   - isActive: bool
+    //   - steps: list
+    //   - createdAt: string (format: date-time)
+    //   - updatedAt: string (format: date-time)
+    //
+    // Collection: connections
+    // Document ID: {connectionId}
+    // Fields:
+    //   - id: string (required)
+    //   - userId: string (required)
+    //   - appId: string (required)
+    //   - name: string (required)
+    //   - apiKey: string (required)
+    //   - createdAt: string (format: date-time)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isValidEmail(email) {
+      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
+    }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email']) &&
+             data.uid is string && data.uid == request.auth.uid &&
+             isValidEmail(data.email);
+    }
+
+    function isValidWorkflow(data) {
+      return data.keys().hasAll(['id', 'userId', 'name', 'steps']) &&
+             data.id is string &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.steps is list;
+    }
+
+    function isValidConnection(data) {
+      return data.keys().hasAll(['id', 'userId', 'appId', 'name', 'apiKey']) &&
+             data.id is string &&
+             data.userId is string && data.userId == request.auth.uid &&
+             data.appId is string &&
+             data.name is string && data.name.size() > 0 && data.name.size() < 100 &&
+             data.apiKey is string && data.apiKey.size() > 0 && data.apiKey.size() < 1000;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidUser(request.resource.data);
+      allow update: if isOwner(userId) && isValidUser(request.resource.data);
+      allow delete: if false; // Users cannot delete their profiles for now
+    }
+
+    match /workflows/{workflowId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && isValidWorkflow(request.resource.data);
+      allow update: if isAuthenticated() && isDocOwner() && isValidWorkflow(request.resource.data);
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
+
+    match /connections/{connectionId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && isValidConnection(request.resource.data);
+      allow update: if isAuthenticated() && isDocOwner() && isValidConnection(request.resource.data);
+      allow delete: if isAuthenticated() && isDocOwner();
+    }
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Stores user profile information and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email", "description": "User's email address" },
+        "displayName": { "type": "string", "description": "User's display name" },
+        "photoURL": { "type": "string", "description": "URL to user's profile picture" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the user was created" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Workflow": {
+      "title": "Workflow",
+      "description": "A user-defined automation workflow.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique workflow ID" },
+        "userId": { "type": "string", "description": "Owner's UID" },
+        "name": { "type": "string", "description": "Workflow name" },
+        "description": { "type": "string", "description": "Workflow description" },
+        "isActive": { "type": "boolean", "description": "Whether the workflow is active" },
+        "steps": { "type": "array", "description": "The steps in the workflow" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the workflow was created" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "When the workflow was last updated" }
+      },
+      "required": ["id", "userId", "name", "steps"]
+    },
+    "Connection": {
+      "title": "App Connection",
+      "description": "Stores API keys and credentials for app integrations.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique connection ID" },
+        "userId": { "type": "string", "description": "Owner's UID" },
+        "appId": { "type": "string", "description": "The ID of the app integration" },
+        "name": { "type": "string", "description": "User-defined name for this connection" },
+        "apiKey": { "type": "string", "description": "The API key or credential" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the connection was created" }
+      },
+      "required": ["id", "userId", "appId", "name", "apiKey"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profile document"
+    },
+    "/workflows/{workflowId}": {
+      "schema": "Workflow",
+      "description": "Workflow document"
+    },
+    "/connections/{connectionId}": {
+      "schema": "Connection",
+      "description": "App connection document"
+    }
+  }
+}

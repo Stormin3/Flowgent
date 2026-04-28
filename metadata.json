@@ -1,0 +1,5 @@
+{
+  "name": "flowgent",
+  "description": "A platform similar to Make or Zapier to connect apps through Agentic MCPs or APIs with plain language prompting.",
+  "requestFramePermissions": []
+}
