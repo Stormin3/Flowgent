@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, Bot, User, Sparkles, Search, Zap, Loader2, X, MessageSquare } from 'lucide-react';
 import { clsx, type ClassValue } from 'clsx';
@@ -52,34 +51,24 @@ export function ResearchChatbot() {
     setIsLoading(true);
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-      
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-pro-preview",
-        contents: [
-          {
-            role: 'user',
-            parts: [{ text: input }]
-          }
-        ],
-        config: {
-          systemInstruction: `You are a world-class Research and Automation Assistant for a no-code platform. 
-          Your goal is to suggest platform connections and automations that benefit the user.
-          Use your deep thinking capabilities to provide tailored, personalized suggestions.
-          Always include:
-          1. Suggested platform connections (e.g., Gmail + Notion + Slack).
-          2. Specific automation strategies with step-by-step instructions.
-          3. Efficiency gains the user can expect.
-          Use Markdown for formatting.`,
-          thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
-          tools: [{ googleSearch: {} }]
-        }
+      const response = await fetch('/api/research', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ prompt: input }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch from research API');
+      }
+
+      const data = await response.json();
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.text || "I'm sorry, I couldn't process that request."
+        content: data.text || "I'm sorry, I couldn't process that request."
       };
 
       setMessages(prev => [...prev, assistantMessage]);
