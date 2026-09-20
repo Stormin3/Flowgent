@@ -3,7 +3,7 @@ import { motion } from 'motion/react';
 import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { WorkflowTemplate, WORKFLOW_TEMPLATES } from '../data/templates';
-import { APPS } from '../data/apps';
+import { APPS, APPS_BY_ID } from '../data/apps';
 import { AppIcon } from './AppIcon';
 
 interface TemplateSuggestionsProps {
@@ -44,7 +44,7 @@ export function TemplateSuggestions({ connectedAppIds, onSelect }: TemplateSugge
             <div className="flex items-center justify-between w-full mb-4">
               <div className="flex -space-x-2">
                 {template.requiredApps.map(appId => {
-                  const app = APPS.find(a => a.id === appId);
+                  const app = APPS_BY_ID[appId];
                   if (!app) return null;
                   return (
                     <div key={appId} className="relative">

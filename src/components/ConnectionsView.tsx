@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
-import { APPS } from '../data/apps';
+import { APPS, APPS_BY_ID } from '../data/apps';
 import { Connection } from '../data/types';
 import { Plus, Trash2, Key, ExternalLink, ShieldCheck, AlertCircle, Search, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -130,13 +130,13 @@ export function ConnectionsView({ hideHeader = false }: ConnectionsViewProps) {
   );
 
   const getAppIcon = (appId: string) => {
-    const app = APPS.find(a => a.id === appId);
+    const app = APPS_BY_ID[appId];
     if (!app) return <Key className="w-5 h-5" />;
     return <Key className="w-5 h-5" style={{ color: app.color }} />;
   };
 
   const getAppName = (appId: string) => {
-    return APPS.find(a => a.id === appId)?.name || 'Unknown App';
+    return APPS_BY_ID[appId]?.name || 'Unknown App';
   };
 
   return (

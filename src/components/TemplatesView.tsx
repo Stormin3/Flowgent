@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Search, Sparkles, Filter, Workflow as WorkflowIcon, ArrowRight, Zap, CheckCircle2 } from 'lucide-react';
 import { WORKFLOW_TEMPLATES, WorkflowTemplate } from '../data/templates';
-import { APPS } from '../data/apps';
+import { APPS, APPS_BY_ID } from '../data/apps';
 import { AppIcon } from './AppIcon';
 import { cn } from '../lib/utils';
 import { auth, db, collection, query, where, onSnapshot, handleFirestoreError, OperationType } from '../firebase';
@@ -146,7 +146,7 @@ export function TemplatesView({ onUseTemplate }: TemplatesViewProps) {
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex -space-x-3">
                       {template.requiredApps.map((appId, i) => {
-                        const app = APPS.find(a => a.id === appId);
+                        const app = APPS_BY_ID[appId];
                         if (!app) return null;
                         const isConnected = connectedAppIds.includes(appId);
                         return (

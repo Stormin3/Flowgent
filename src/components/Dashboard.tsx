@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, Play, Pause, MoreVertical, Search, Zap, Clock, History, CheckCircle2, XCircle, Activity, RotateCcw, ChevronRight } from 'lucide-react';
 import { Workflow, WorkflowVersion, RunStatus } from '../data/types';
-import { APPS } from '../data/apps';
+import { APPS, APPS_BY_ID } from '../data/apps';
 import { AppIcon } from './AppIcon';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
@@ -141,7 +141,7 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
                     {/* App Icons */}
                     <div className="flex items-center shrink-0">
                       {workflow.steps.filter(s => s.appId).slice(0, 3).map((step, i) => {
-                        const app = APPS.find(a => a.id === step.appId);
+                        const app = step.appId ? APPS_BY_ID[step.appId] : undefined;
                         if (!app) return null;
                         return (
                           <div 

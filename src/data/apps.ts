@@ -802,3 +802,8 @@ export const APPS: AppIntegration[] = [
     ],
   },
 ];
+
+export const APPS_BY_ID = APPS.reduce((acc, app) => {
+  acc[app.id] = app;
+  return acc;
+}, {} as Record<string, AppIntegration>);
