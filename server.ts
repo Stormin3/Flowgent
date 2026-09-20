@@ -1,6 +1,7 @@
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import Database from 'better-sqlite3';
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import crypto from 'crypto';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -146,6 +147,45 @@ app.post('/api/execute-action', (req, res) => {
   } catch (error) {
     console.error('Error executing action:', error);
     res.status(500).json({ error: 'Failed to execute action' });
+  }
+});
+
+app.post('/api/research', async (req, res) => {
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ error: 'Prompt is required' });
+  }
+
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.1-pro-preview",
+      contents: [
+        {
+          role: 'user',
+          parts: [{ text: prompt }]
+        }
+      ],
+      config: {
+        systemInstruction: `You are a world-class Research and Automation Assistant for a no-code platform.
+        Your goal is to suggest platform connections and automations that benefit the user.
+        Use your deep thinking capabilities to provide tailored, personalized suggestions.
+        Always include:
+        1. Suggested platform connections (e.g., Gmail + Notion + Slack).
+        2. Specific automation strategies with step-by-step instructions.
+        3. Efficiency gains the user can expect.
+        Use Markdown for formatting.`,
+        thinkingConfig: { thinkingLevel: ThinkingLevel.HIGH },
+        tools: [{ googleSearch: {} }]
+      }
+    });
+
+    res.json({ text: response.text });
+  } catch (error) {
+    console.error('Gemini API error:', error);
+    res.status(500).json({ error: 'Failed to process research request' });
   }
 });
 
