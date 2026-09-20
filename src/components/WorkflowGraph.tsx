@@ -211,11 +211,11 @@ export function WorkflowGraph({
     return newEdges;
   }, [steps]);
 
-  const onNodeClick = useCallback((_: any, node: Node) => {
+  const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
     onStepClick(node.id);
   }, [onStepClick]);
 
-  const onNodeDragStop = useCallback((_: any, node: Node) => {
+  const onNodeDragStop = useCallback((_: React.MouseEvent, node: Node) => {
     onUpdateStepPosition(node.id, node.position);
   }, [onUpdateStepPosition]);
 
