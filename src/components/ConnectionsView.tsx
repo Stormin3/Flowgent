@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
 import { APPS } from '../data/apps';
 import { Connection } from '../data/types';
+import { validateApiKey } from '../lib/validators';
 import { Plus, Trash2, Key, ExternalLink, ShieldCheck, AlertCircle, Search, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '../lib/utils';
@@ -23,18 +24,6 @@ export function ConnectionsView({ hideHeader = false }: ConnectionsViewProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
-
-  const validateApiKey = (key: string) => {
-    if (key.length < 8) {
-      return 'API key must be at least 8 characters long.';
-    }
-    // Simple regex for common API key formats (alphanumeric, hyphens, underscores, dots)
-    const apiKeyRegex = /^[a-zA-Z0-9._-]+$/;
-    if (!apiKeyRegex.test(key)) {
-      return 'API key contains invalid characters. Use only letters, numbers, dots, hyphens, or underscores.';
-    }
-    return null;
-  };
 
   useEffect(() => {
     if (apiKey) {
