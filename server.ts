@@ -34,10 +34,14 @@ db.exec(`
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
 const ALGORITHM = 'aes-256-cbc';
 
+// Use a robust Key Derivation Function (KDF) to derive a 32-byte key from the ENCRYPTION_KEY.
+// We use scrypt with a fixed salt to ensure the same key is derived across restarts.
+// In a more complex setup, the salt could also be managed as an environment variable.
+const KEY_BUFFER = crypto.scryptSync(ENCRYPTION_KEY, 'static-salt-for-key-derivation', 32);
+
 function encrypt(text: string) {
-  const keyBuffer = Buffer.from(ENCRYPTION_KEY.padEnd(32, '0').slice(0, 32));
   const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv(ALGORITHM, keyBuffer, iv);
+  const cipher = crypto.createCipheriv(ALGORITHM, KEY_BUFFER, iv);
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   return {
@@ -47,9 +51,8 @@ function encrypt(text: string) {
 }
 
 function decrypt(encryptedData: string, ivHex: string) {
-  const keyBuffer = Buffer.from(ENCRYPTION_KEY.padEnd(32, '0').slice(0, 32));
   const iv = Buffer.from(ivHex, 'hex');
-  const decipher = crypto.createDecipheriv(ALGORITHM, keyBuffer, iv);
+  const decipher = crypto.createDecipheriv(ALGORITHM, KEY_BUFFER, iv);
   let decrypted = decipher.update(encryptedData, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;
