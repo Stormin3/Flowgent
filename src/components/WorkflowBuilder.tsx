@@ -21,7 +21,7 @@ import {
   Edit2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { APPS, AppIntegration, AppEvent } from '../data/apps';
+import { APPS, AppIntegration, AppEvent, APPS_BY_ID } from '../data/apps';
 import { AppIcon } from './AppIcon';
 import { Workflow, WorkflowStep, ErrorHandlingRule, Connection } from '../data/types';
 import { WorkflowGraph } from './WorkflowGraph';
@@ -542,7 +542,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'config' | 'mapping'>('config');
   
-  const selectedApp = APPS.find(a => a.id === step.appId);
+  const selectedApp = APPS_BY_ID[step.appId];
   const events = selectedApp ? (step.type === 'trigger' ? selectedApp.triggers : selectedApp.actions) : [];
   
   const filteredApps = APPS.filter(app => 
@@ -559,7 +559,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
     }))
   );
 
-  const triggerApp = triggerStep ? APPS.find(a => a.id === triggerStep.appId) : null;
+  const triggerApp = triggerStep ? APPS_BY_ID[triggerStep.appId] : null;
   const triggerEvent = triggerApp ? triggerApp.triggers.find(e => e.id === triggerStep.eventId) : null;
 
   const otherSteps = allSteps.filter(s => s.id !== step.id);
@@ -977,7 +977,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                       } 
                     })}
                     options={otherSteps.map(s => {
-                      const app = APPS.find(a => a.id === s.appId);
+                      const app = APPS_BY_ID[s.appId];
                       const event = app ? (s.type === 'trigger' ? app.triggers : app.actions).find(e => e.id === s.eventId) : null;
                       return {
                         id: s.id,
@@ -1194,7 +1194,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                             onUpdate({ errorConfig: { ...step.errorConfig!, rules: newRules } });
                           }}
                           options={otherSteps.map(s => {
-                            const app = APPS.find(a => a.id === s.appId);
+                            const app = APPS_BY_ID[s.appId];
                             const event = app ? (s.type === 'trigger' ? app.triggers : app.actions).find(e => e.id === s.eventId) : null;
                             return {
                               id: s.id,
@@ -1540,7 +1540,7 @@ function VariableSelector({
                     </div>
                   )}
                   {precedingSteps.map((s, i) => {
-                  const app = APPS.find(a => a.id === s.appId);
+                  const app = APPS_BY_ID[s.appId];
                   const event = app ? (s.type === 'trigger' ? app.triggers : app.actions).find(e => e.id === s.eventId) : null;
                   if (!app || !event) return null;
                   

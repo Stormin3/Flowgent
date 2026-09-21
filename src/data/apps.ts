@@ -802,3 +802,7 @@ export const APPS: AppIntegration[] = [
     ],
   },
 ];
+
+export const APPS_BY_ID: Record<string, AppIntegration> = Object.fromEntries(
+  APPS.map(app => [app.id, app])
+);
