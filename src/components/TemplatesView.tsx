@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Search, Sparkles, Filter, Workflow as WorkflowIcon, ArrowRight, Zap, CheckCircle2 } from 'lucide-react';
+import { Search, Sparkles, Workflow, ArrowRight, Zap } from 'lucide-react';
 import { WORKFLOW_TEMPLATES, WorkflowTemplate } from '../data/templates';
 import { APPS, APPS_BY_ID } from '../data/apps';
 import { AppIcon } from './AppIcon';
@@ -173,7 +173,7 @@ export function TemplatesView({ onUseTemplate }: TemplatesViewProps) {
 
                   <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
-                      <WorkflowIcon className="w-4 h-4" />
+                      <Workflow className="w-4 h-4" />
                       {template.steps.length} Steps
                     </div>
                     <button
