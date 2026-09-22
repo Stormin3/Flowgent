@@ -34,7 +34,7 @@ export function Sidebar({ currentView, onChangeView, isOpen, onClose, darkMode, 
             </div>
             <span className="text-xl font-bold text-white tracking-tight">flowgent</span>
           </div>
-          <button onClick={onClose} className="md:hidden p-2 text-slate-400 hover:text-white">
+          <button onClick={onClose} className="md:hidden p-2 text-slate-400 hover:text-white" aria-label="Close sidebar">
             <X className="w-5 h-5" />
           </button>
         </div>

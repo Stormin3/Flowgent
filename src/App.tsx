@@ -180,12 +180,14 @@ export default function App() {
           <button 
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus:outline-none"
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
           >
             {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
           <button 
             onClick={() => setIsMobileMenuOpen(true)}
             className="p-2 text-slate-500 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus:outline-none"
+            aria-label="Open mobile menu"
           >
             <Menu className="w-6 h-6" />
           </button>
