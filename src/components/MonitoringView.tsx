@@ -26,17 +26,19 @@ export const generateMockRuns = (): WorkflowRun[] => {
         {
           id: `sr_${i}_1`,
           stepId: 'step_1',
-          status: 'success',
+          status: 'success' as RunStatus,
           startedAt: startedAt.toISOString(),
           completedAt: new Date(startedAt.getTime() + 100).toISOString(),
+          durationMs: 100,
           logs: ['[INFO] Webhook received', '[INFO] Payload validated'],
         },
         {
           id: `sr_${i}_2`,
           stepId: 'step_2',
-          status: status === 'running' ? 'running' : status,
+          status: (status === 'running' ? 'running' : status) as RunStatus,
           startedAt: new Date(startedAt.getTime() + 100).toISOString(),
           completedAt: status === 'running' ? undefined : new Date(startedAt.getTime() + 500).toISOString(),
+          durationMs: status === 'running' ? undefined : 400,
           logs: ['[INFO] Connecting to target integration', ... (isError ? ['[ERROR] HTTP 429 Too Many Requests'] : ['[INFO] Data mapped successfully', '[INFO] Action completed'])],
           error: isError ? 'HTTP 429 Too Many Requests' : undefined,
         }
