@@ -806,3 +806,17 @@ export const APPS: AppIntegration[] = [
 export const APPS_BY_ID: Record<string, AppIntegration> = Object.fromEntries(
   APPS.map(app => [app.id, app])
 );
+
+// ⚡ Bolt: O(1) lookup map for events to prevent O(n) array finds during render
+export const EVENTS_BY_APP_AND_ID: Record<string, Record<string, AppEvent>> = {};
+APPS.forEach(app => {
+  EVENTS_BY_APP_AND_ID[app.id] = {};
+  app.triggers.forEach(trigger => {
+    EVENTS_BY_APP_AND_ID[app.id][trigger.id] = trigger;
+  });
+  if (app.actions) {
+    app.actions.forEach(action => {
+      EVENTS_BY_APP_AND_ID[app.id][action.id] = action;
+    });
+  }
+});
