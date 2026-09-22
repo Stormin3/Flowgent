@@ -112,6 +112,7 @@ export type StepRun = {
   status: RunStatus;
   startedAt: string;
   completedAt?: string;
+  durationMs?: number;
   logs: string[];
   error?: string;
 };
