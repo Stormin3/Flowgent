@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { v4 as uuidv4 } from 'uuid';
 import { 
@@ -545,10 +545,21 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
   const selectedApp = APPS_BY_ID[step.appId];
   const events = selectedApp ? (step.type === 'trigger' ? selectedApp.triggers : selectedApp.actions) : [];
   
-  const filteredApps = APPS.filter(app => 
-    app.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    (step.type === 'trigger' ? app.triggers.length > 0 : app.actions.length > 0)
-  );
+  const filteredApps = useMemo(() => {
+    const lowerQuery = searchQuery.toLowerCase();
+    return APPS.filter(app => {
+      const appEvents = step.type === 'trigger' ? app.triggers : app.actions;
+      if (appEvents.length === 0) return false;
+
+      const matchesApp = app.name.toLowerCase().includes(lowerQuery);
+      const matchesEvents = appEvents.some(e =>
+        e.name.toLowerCase().includes(lowerQuery) ||
+        e.description.toLowerCase().includes(lowerQuery)
+      );
+
+      return matchesApp || matchesEvents;
+    });
+  }, [searchQuery, step.type]);
 
   const allEvents = APPS.flatMap(app => 
     (step.type === 'trigger' ? app.triggers : app.actions).map(e => ({
@@ -626,23 +637,13 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
               </div>
               
               <div className="space-y-6">
-                {APPS.filter(app => {
+                {filteredApps.map(app => {
                   const appEvents = step.type === 'trigger' ? app.triggers : app.actions;
-                  if (appEvents.length === 0) return false;
-                  
-                  const matchesApp = app.name.toLowerCase().includes(searchQuery.toLowerCase());
-                  const matchesEvents = appEvents.some(e => 
-                    e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                    e.description.toLowerCase().includes(searchQuery.toLowerCase())
-                  );
-                  
-                  return matchesApp || matchesEvents;
-                }).map(app => {
-                  const appEvents = step.type === 'trigger' ? app.triggers : app.actions;
+                  const lowerQuery = searchQuery.toLowerCase();
                   const filteredEvents = appEvents.filter(e => 
-                    e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                    e.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    app.name.toLowerCase().includes(searchQuery.toLowerCase())
+                    e.name.toLowerCase().includes(lowerQuery) ||
+                    e.description.toLowerCase().includes(lowerQuery) ||
+                    app.name.toLowerCase().includes(lowerQuery)
                   );
                   
                   return (
@@ -674,16 +675,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                   );
                 })}
                 
-                {APPS.filter(app => {
-                  const appEvents = step.type === 'trigger' ? app.triggers : app.actions;
-                  if (appEvents.length === 0) return false;
-                  const matchesApp = app.name.toLowerCase().includes(searchQuery.toLowerCase());
-                  const matchesEvents = appEvents.some(e => 
-                    e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                    e.description.toLowerCase().includes(searchQuery.toLowerCase())
-                  );
-                  return matchesApp || matchesEvents;
-                }).length === 0 && (
+                {filteredApps.length === 0 && (
                   <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-sm">
                     No {step.type}s found matching "{searchQuery}"
                   </div>
