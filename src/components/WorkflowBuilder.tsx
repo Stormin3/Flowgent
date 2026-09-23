@@ -438,6 +438,7 @@ export function WorkflowBuilder({ workflow: initialWorkflow, onSave, onBack }: W
                   <button 
                     onClick={() => setShowConnectModal(false)}
                     className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                    aria-label="Close modal"
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -1036,6 +1037,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                         });
                       }}
                       className="absolute -top-2 -right-2 w-6 h-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-full flex items-center justify-center text-slate-400 hover:text-red-500 hover:border-red-200 dark:hover:border-red-900/50 opacity-0 group-hover:opacity-100 transition-all shadow-sm"
+                      aria-label="Remove error rule"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -1252,6 +1254,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                           <button 
                             onClick={() => onUpdate({ config: { ...step.config, [field.id]: '' } })}
                             className="ml-auto p-1 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 rounded-md transition-colors"
+                            aria-label="Clear field"
                           >
                             <X className="w-3 h-3 text-indigo-400" />
                           </button>
@@ -1336,6 +1339,7 @@ function ParametersModal({ parameters, onUpdate, onClose }: {
           <button 
             onClick={onClose}
             className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
+            aria-label="Close modal"
           >
             <X className="w-6 h-6" />
           </button>
@@ -1364,6 +1368,7 @@ function ParametersModal({ parameters, onUpdate, onClose }: {
                   <button
                     onClick={() => handleRemoveParameter(param.id)}
                     className="absolute top-4 right-4 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                    aria-label="Remove parameter"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
