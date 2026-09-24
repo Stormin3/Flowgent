@@ -58,6 +58,21 @@ function decrypt(encryptedData: string, ivHex: string) {
   return decrypted;
 }
 
+// Rate Limiting setup
+const researchRateLimit = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 5;
+
+// Cleanup interval to prevent memory leaks from the Map
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, record] of researchRateLimit.entries()) {
+    if (now > record.resetTime) {
+      researchRateLimit.delete(ip);
+    }
+  }
+}, RATE_LIMIT_WINDOW_MS);
+
 // API Routes for Connections
 app.get('/api/connections', (req, res) => {
   const userId = req.query.userId as string;
@@ -156,8 +171,29 @@ app.post('/api/execute-action', (req, res) => {
 app.post('/api/research', async (req, res) => {
   const { prompt } = req.body;
 
-  if (!prompt) {
-    return res.status(400).json({ error: 'Prompt is required' });
+  // Input validation
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: 'Valid prompt is required' });
+  }
+  if (prompt.length > 2000) {
+    return res.status(400).json({ error: 'Prompt exceeds maximum allowed length' });
+  }
+
+  // Rate Limiting
+  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+  const limitRecord = researchRateLimit.get(clientIp);
+
+  if (limitRecord) {
+    if (now > limitRecord.resetTime) {
+      researchRateLimit.set(clientIp, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    } else if (limitRecord.count >= MAX_REQUESTS_PER_WINDOW) {
+      return res.status(429).json({ error: 'Too many requests, please try again later' });
+    } else {
+      limitRecord.count += 1;
+    }
+  } else {
+    researchRateLimit.set(clientIp, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
   }
 
   try {
