@@ -806,3 +806,12 @@ export const APPS: AppIntegration[] = [
 export const APPS_BY_ID: Record<string, AppIntegration> = Object.fromEntries(
   APPS.map(app => [app.id, app])
 );
+
+export const EVENTS_BY_APP_AND_ID: Record<string, Record<string, AppEvent>> = Object.fromEntries(
+  APPS.map(app => [
+    app.id,
+    Object.fromEntries(
+      [...app.triggers, ...app.actions].map(event => [event.id, event])
+    )
+  ])
+);

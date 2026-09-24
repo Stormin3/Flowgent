@@ -17,7 +17,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { WorkflowStep } from '../data/types';
-import { APPS, APPS_BY_ID } from '../data/apps';
+import { APPS, APPS_BY_ID, EVENTS_BY_APP_AND_ID } from '../data/apps';
 import { AppIcon } from './AppIcon';
 import { Zap, Play, CheckCircle2, Settings, Plus, Trash2, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -41,7 +41,7 @@ type StepNode = Node<StepNodeData, 'step'>;
 const StepNodeComponent = ({ data, selected }: NodeProps<StepNode>) => {
   const { step, onRemove } = data;
   const app = APPS_BY_ID[step.appId];
-  const event = app ? (step.type === 'trigger' ? app.triggers : app.actions).find(e => e.id === step.eventId) : null;
+  const event = app && step.eventId ? EVENTS_BY_APP_AND_ID[app.id]?.[step.eventId] : null;
 
   return (
     <div className={cn(

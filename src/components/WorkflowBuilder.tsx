@@ -21,7 +21,7 @@ import {
   Edit2
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { APPS, AppIntegration, AppEvent, APPS_BY_ID } from '../data/apps';
+import { APPS, AppIntegration, AppEvent, APPS_BY_ID, EVENTS_BY_APP_AND_ID } from '../data/apps';
 import { AppIcon } from './AppIcon';
 import { Workflow, WorkflowStep, ErrorHandlingRule, Connection } from '../data/types';
 import { WorkflowGraph } from './WorkflowGraph';
@@ -571,7 +571,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
   );
 
   const triggerApp = triggerStep ? APPS_BY_ID[triggerStep.appId] : null;
-  const triggerEvent = triggerApp ? triggerApp.triggers.find(e => e.id === triggerStep.eventId) : null;
+  const triggerEvent = triggerApp ? EVENTS_BY_APP_AND_ID[triggerStep.appId]?.[triggerStep.eventId || ""] : null;
 
   const otherSteps = allSteps.filter(s => s.id !== step.id);
   const currentIndex = allSteps.findIndex(s => s.id === step.id);
@@ -768,7 +768,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
         )}
 
         {/* Configuration Fields */}
-        {selectedApp && step.eventId && events.find(e => e.id === step.eventId)?.fields && (
+        {selectedApp && step.eventId && EVENTS_BY_APP_AND_ID[step.appId]?.[step.eventId || ""]?.fields && (
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -776,7 +776,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
           >
             <label className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">5. Configuration</label>
             <div className="space-y-4">
-              {events.find(e => e.id === step.eventId)?.fields?.map(field => (
+              {EVENTS_BY_APP_AND_ID[step.appId]?.[step.eventId || ""]?.fields?.map(field => (
                 <div key={field.id} className="space-y-2">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -970,7 +970,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                     })}
                     options={otherSteps.map(s => {
                       const app = APPS_BY_ID[s.appId];
-                      const event = app ? (s.type === 'trigger' ? app.triggers : app.actions).find(e => e.id === s.eventId) : null;
+                      const event = app && s.eventId ? EVENTS_BY_APP_AND_ID[app.id]?.[s.eventId] : null;
                       return {
                         id: s.id,
                         name: app ? `${app.name}: ${event?.name || 'Step'}` : 'Unnamed Step',
@@ -1187,7 +1187,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                           }}
                           options={otherSteps.map(s => {
                             const app = APPS_BY_ID[s.appId];
-                            const event = app ? (s.type === 'trigger' ? app.triggers : app.actions).find(e => e.id === s.eventId) : null;
+                            const event = app && s.eventId ? EVENTS_BY_APP_AND_ID[app.id]?.[s.eventId] : null;
                             return {
                               id: s.id,
                               name: app ? `${app.name}: ${event?.name || 'Step'}` : 'Unnamed Step',
@@ -1231,7 +1231,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
             </div>
 
             <div className="space-y-4">
-              {events.find(e => e.id === step.eventId)?.fields?.map(field => (
+              {EVENTS_BY_APP_AND_ID[step.appId]?.[step.eventId || ""]?.fields?.map(field => (
                 <div key={field.id} className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-sm">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -1274,7 +1274,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                 </div>
               ))}
               
-              {(!events.find(e => e.id === step.eventId)?.fields || events.find(e => e.id === step.eventId)?.fields?.length === 0) && (
+              {(!EVENTS_BY_APP_AND_ID[step.appId]?.[step.eventId || ""]?.fields || EVENTS_BY_APP_AND_ID[step.appId]?.[step.eventId || ""]?.fields?.length === 0) && (
                 <div className="text-center py-12 bg-slate-50 dark:bg-slate-800/30 rounded-3xl border border-dashed border-slate-200 dark:border-slate-800">
                   <Settings className="w-12 h-12 text-slate-300 dark:text-slate-700 mx-auto mb-4" />
                   <p className="text-sm text-slate-500 dark:text-slate-400">No fields available to map for this event.</p>
@@ -1533,7 +1533,7 @@ function VariableSelector({
                   )}
                   {precedingSteps.map((s, i) => {
                   const app = APPS_BY_ID[s.appId];
-                  const event = app ? (s.type === 'trigger' ? app.triggers : app.actions).find(e => e.id === s.eventId) : null;
+                  const event = app && s.eventId ? EVENTS_BY_APP_AND_ID[app.id]?.[s.eventId] : null;
                   if (!app || !event) return null;
                   
                   return (
