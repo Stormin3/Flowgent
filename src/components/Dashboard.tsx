@@ -129,7 +129,11 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
                 </button>
               </div>
             ) : (
-              workflows.map(workflow => (
+              workflows.map(workflow => {
+                // ⚡ Bolt: Compute filtered appSteps once per workflow to prevent redundant O(n) filtering during render
+                const appSteps = workflow.steps.filter(s => s.appId);
+
+                return (
                 <motion.div 
                   key={workflow.id}
                   initial={{ opacity: 0 }}
@@ -140,7 +144,7 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
                   <div className="flex items-center gap-4 md:gap-6">
                     {/* App Icons */}
                     <div className="flex items-center shrink-0">
-                      {workflow.steps.filter(s => s.appId).slice(0, 3).map((step, i) => {
+                      {appSteps.slice(0, 3).map((step, i) => {
                         const app = APPS_BY_ID[step.appId];
                         if (!app) return null;
                         return (
@@ -156,12 +160,12 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
                           </div>
                         );
                       })}
-                      {workflow.steps.filter(s => s.appId).length > 3 && (
+                      {appSteps.length > 3 && (
                         <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl border-2 border-white dark:border-slate-900 shadow-sm bg-slate-100 dark:bg-slate-800 flex items-center justify-center -ml-2 md:-ml-3 z-0 text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400">
-                          +{workflow.steps.filter(s => s.appId).length - 3}
+                          +{appSteps.length - 3}
                         </div>
                       )}
-                      {workflow.steps.filter(s => s.appId).length === 0 && (
+                      {appSteps.length === 0 && (
                         <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl border-2 border-slate-200 dark:border-slate-800 border-dashed bg-slate-50 dark:bg-slate-900 flex items-center justify-center text-slate-400">
                           <Zap className="w-4 h-4" />
                         </div>
@@ -214,7 +218,8 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
                     </button>
                   </div>
                 </motion.div>
-              ))
+              );
+              })
             )}
           </div>
         </div>
