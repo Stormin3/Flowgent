@@ -34,6 +34,52 @@ db.exec(`
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
 const ALGORITHM = 'aes-256-cbc';
 
+// Rate Limiting Setup for sensitive endpoints (e.g., /api/research)
+// Tracks IP requests to prevent abuse and quota exhaustion.
+const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
+const MAX_REQUESTS_PER_WINDOW = 50; // max requests per IP
+
+interface RateLimitInfo {
+  count: number;
+  resetTime: number;
+}
+
+const rateLimitMap = new Map<string, RateLimitInfo>();
+
+// Cleanup interval to prevent memory leaks as per system guidelines.
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, info] of rateLimitMap.entries()) {
+    if (now > info.resetTime) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}, 60 * 1000); // Cleanup every minute
+
+// Rate limiting middleware
+const rateLimiter = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  const ip = req.ip || req.socket.remoteAddress || 'unknown';
+  const now = Date.now();
+
+  const record = rateLimitMap.get(ip);
+  if (!record) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return next();
+  }
+
+  if (now > record.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return next();
+  }
+
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return res.status(429).json({ error: 'Too many requests, please try again later.' });
+  }
+
+  record.count += 1;
+  next();
+};
+
 // Use a robust Key Derivation Function (KDF) to derive a 32-byte key from the ENCRYPTION_KEY.
 // We use scrypt with a fixed salt to ensure the same key is derived across restarts.
 // In a more complex setup, the salt could also be managed as an environment variable.
@@ -153,7 +199,7 @@ app.post('/api/execute-action', (req, res) => {
   }
 });
 
-app.post('/api/research', async (req, res) => {
+app.post('/api/research', rateLimiter, async (req, res) => {
   const { prompt } = req.body;
 
   if (!prompt) {
