@@ -197,6 +197,7 @@ export function ConnectionsView({ hideHeader = false }: ConnectionsViewProps) {
                   <button
                     onClick={() => handleDeleteConnection(conn.id)}
                     className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-colors"
+                    aria-label="Delete connection"
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
@@ -244,7 +245,7 @@ export function ConnectionsView({ hideHeader = false }: ConnectionsViewProps) {
             >
               <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white">Add New Connection</h2>
-                <button onClick={() => setIsAddModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                <button onClick={() => setIsAddModalOpen(false)} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" aria-label="Close modal">
                   <X className="w-6 h-6" />
                 </button>
               </div>
