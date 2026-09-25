@@ -153,7 +153,39 @@ app.post('/api/execute-action', (req, res) => {
   }
 });
 
+// Rate Limiting for /api/research
+const researchRateLimits = new Map<string, { count: number, startTime: number }>();
+const RATE_LIMIT_WINDOW_MS = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 5;
+
+// Cleanup interval to prevent memory leaks from inactive IPs
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of researchRateLimits.entries()) {
+    if (now - data.startTime > RATE_LIMIT_WINDOW_MS) {
+      researchRateLimits.delete(ip);
+    }
+  }
+}, RATE_LIMIT_WINDOW_MS);
+
 app.post('/api/research', async (req, res) => {
+  const ip = req.ip || req.connection.remoteAddress || 'unknown';
+  const now = Date.now();
+
+  const userRate = researchRateLimits.get(ip);
+  if (userRate) {
+    if (now - userRate.startTime < RATE_LIMIT_WINDOW_MS) {
+      if (userRate.count >= MAX_REQUESTS_PER_WINDOW) {
+        return res.status(429).json({ error: 'Too many requests, please try again later.' });
+      }
+      userRate.count++;
+    } else {
+      researchRateLimits.set(ip, { count: 1, startTime: now });
+    }
+  } else {
+    researchRateLimits.set(ip, { count: 1, startTime: now });
+  }
+
   const { prompt } = req.body;
 
   if (!prompt) {
