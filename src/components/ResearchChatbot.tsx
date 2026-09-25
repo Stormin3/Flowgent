@@ -93,6 +93,7 @@ export function ResearchChatbot() {
           "fixed bottom-6 right-6 p-4 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-all z-50",
           isOpen && "scale-0 opacity-0"
         )}
+        aria-label="Open research assistant"
       >
         <MessageSquare className="w-6 h-6" />
       </button>
@@ -120,6 +121,7 @@ export function ResearchChatbot() {
               <button
                 onClick={() => setIsOpen(false)}
                 className="p-1 hover:bg-white/20 rounded-lg transition-colors"
+                aria-label="Close research assistant"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -177,11 +179,13 @@ export function ResearchChatbot() {
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask about automations or research..."
                   className="w-full pl-4 pr-12 py-3 bg-slate-100 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all"
+                  aria-label="Message research assistant"
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 transition-all"
+                  aria-label="Send message"
                 >
                   <Send className="w-4 h-4" />
                 </button>
