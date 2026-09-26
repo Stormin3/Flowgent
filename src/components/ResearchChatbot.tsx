@@ -89,6 +89,7 @@ export function ResearchChatbot() {
       {/* Floating Toggle Button */}
       <button
         onClick={() => setIsOpen(true)}
+        aria-label="Open research assistant"
         className={cn(
           "fixed bottom-6 right-6 p-4 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-all z-50",
           isOpen && "scale-0 opacity-0"
@@ -119,6 +120,7 @@ export function ResearchChatbot() {
               </div>
               <button
                 onClick={() => setIsOpen(false)}
+                aria-label="Close research assistant"
                 className="p-1 hover:bg-white/20 rounded-lg transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -180,6 +182,7 @@ export function ResearchChatbot() {
                 />
                 <button
                   onClick={handleSend}
+                  aria-label="Send message"
                   disabled={!input.trim() || isLoading}
                   className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:hover:bg-indigo-600 transition-all"
                 >
