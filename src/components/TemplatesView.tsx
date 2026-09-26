@@ -44,9 +44,10 @@ export function TemplatesView({ onUseTemplate }: TemplatesViewProps) {
   }, []);
 
   const filteredTemplates = useMemo(() => {
+    const query = searchQuery.toLowerCase();
     return WORKFLOW_TEMPLATES.filter(t => {
-      const matchesSearch = t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           t.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = t.title.toLowerCase().includes(query) ||
+                           t.description.toLowerCase().includes(query);
       const matchesCategory = selectedCategory === 'All' || t.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });

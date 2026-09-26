@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Activity, AlertTriangle, CheckCircle2, XCircle, RotateCcw, Clock, Target, Terminal, Search, Play, Filter } from 'lucide-react';
 import { WorkflowRun, StepRun, RunStatus } from '../data/types';
@@ -73,12 +73,15 @@ export function MonitoringView() {
     return () => clearInterval(interval);
   }, []);
 
-  const filteredRuns = runs.filter(run => {
-    if (filter === 'failed' && !['failed', 'retrying'].includes(run.status)) return false;
-    if (filter === 'running' && run.status !== 'running') return false;
-    if (searchQuery && !run.workflowName.toLowerCase().includes(searchQuery.toLowerCase()) && !run.id.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-    return true;
-  });
+  const filteredRuns = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return runs.filter(run => {
+      if (filter === 'failed' && !['failed', 'retrying'].includes(run.status)) return false;
+      if (filter === 'running' && run.status !== 'running') return false;
+      if (searchQuery && !run.workflowName.toLowerCase().includes(query) && !run.id.toLowerCase().includes(query)) return false;
+      return true;
+    });
+  }, [runs, filter, searchQuery]);
 
   const getStatusIcon = (status: RunStatus) => {
     switch (status) {

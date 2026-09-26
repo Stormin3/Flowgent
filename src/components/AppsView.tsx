@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { APPS } from '../data/apps';
 import { AppIcon } from './AppIcon';
@@ -7,13 +7,16 @@ export function AppsView() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const categories = Array.from(new Set(APPS.map(app => app.category))).sort();
+  const categories = useMemo(() => Array.from(new Set(APPS.map(app => app.category))).sort(), []);
 
-  const filteredApps = APPS.filter(app => {
-    const matchesSearch = app.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory ? app.category === selectedCategory : true;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredApps = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return APPS.filter(app => {
+      const matchesSearch = app.name.toLowerCase().includes(query);
+      const matchesCategory = selectedCategory ? app.category === selectedCategory : true;
+      return matchesSearch && matchesCategory;
+    });
+  }, [searchQuery, selectedCategory]);
 
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 md:p-8 transition-colors duration-300">

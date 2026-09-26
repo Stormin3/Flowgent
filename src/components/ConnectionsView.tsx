@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { auth } from '../firebase';
 import { APPS, APPS_BY_ID } from '../data/apps';
 import { Connection } from '../data/types';
@@ -114,9 +114,12 @@ export function ConnectionsView({ hideHeader = false }: ConnectionsViewProps) {
     }
   };
 
-  const filteredApps = APPS.filter(app => 
-    app.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredApps = useMemo(() => {
+    const query = searchQuery.toLowerCase();
+    return APPS.filter(app =>
+      app.name.toLowerCase().includes(query)
+    );
+  }, [searchQuery]);
 
   const getAppIcon = (appId: string) => {
     const app = APPS_BY_ID[appId];
