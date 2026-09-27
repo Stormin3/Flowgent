@@ -83,6 +83,8 @@ export function MonitoringView() {
     });
   }, [runs, filter, searchQuery]);
 
+  const failedRunsCount = useMemo(() => runs.filter(r => r.status === 'failed').length, [runs]);
+
   const getStatusIcon = (status: RunStatus) => {
     switch (status) {
       case 'success': return <CheckCircle2 className="w-5 h-5 text-emerald-500" />;
@@ -149,7 +151,7 @@ export function MonitoringView() {
             <div className="flex items-center gap-2 mb-4">
               <button onClick={() => setFilter('all')} className={cn("px-4 py-2 rounded-full text-sm font-medium transition-all", filter === 'all' ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-md" : "text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800")}>All Activity</button>
               <button onClick={() => setFilter('failed')} className={cn("px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2", filter === 'failed' ? "bg-rose-500 text-white shadow-md shadow-rose-500/20" : "text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800")}>
-                Failures {runs.filter(r => r.status === 'failed').length > 0 && <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">{runs.filter(r => r.status === 'failed').length}</span>}
+                Failures {failedRunsCount > 0 && <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">{failedRunsCount}</span>}
               </button>
               <button onClick={() => setFilter('running')} className={cn("px-4 py-2 rounded-full text-sm font-medium transition-all", filter === 'running' ? "bg-indigo-500 text-white shadow-md shadow-indigo-500/20" : "text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800")}>Active Runs</button>
             </div>
