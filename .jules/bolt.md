@@ -9,3 +9,7 @@
 ## $(date +%Y-%m-%d) - Redundant filtering in array mapping
 **Learning:** In React components like `Dashboard.tsx`, mapping over an array (e.g., `workflows`) and repeatedly computing the same derived array using `.filter()` (e.g., `workflow.steps.filter(s => s.appId)`) inside the return payload causes redundant O(N) operations per render cycle. This specific pattern was found doing this computation 3-4 times per row.
 **Action:** Always extract repeated O(N) filtering inside loops or array mappings into a single scoped variable at the top of the block, preventing duplicate execution and maintaining cleaner code.
+
+## 2026-09-27 - Optimize Inline Filtering Inside render loop
+**Learning:** In React components like `WorkflowBuilder.tsx`, `MonitoringView.tsx` and `Dashboard.tsx`, performing expensive `.filter()` and `.toLowerCase()` operations repeatedly inside the render cycle (or even worse, inside an array `.map()`) causes unnecessary performance degradation and re-renders.
+**Action:** Extract repetitive list filtering and string transformation logic into `useMemo` hooks prior to rendering, preventing repeated calculation and optimizing CPU cycles.

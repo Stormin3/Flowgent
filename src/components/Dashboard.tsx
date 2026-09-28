@@ -41,6 +41,8 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
     }
   };
 
+  const activeWorkflowsCount = React.useMemo(() => workflows.filter(w => w.isActive).length, [workflows]);
+
   return (
     <div className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 p-4 md:p-8 transition-colors duration-300">
       <div className="max-w-6xl mx-auto space-y-6 md:space-y-8">
@@ -68,7 +70,7 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
             </div>
             <div>
               <p className="text-xs md:text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Workflows</p>
-              <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{workflows.filter(w => w.isActive).length}</p>
+              <p className="text-xl md:text-2xl font-bold text-slate-900 dark:text-white">{activeWorkflowsCount}</p>
             </div>
           </div>
           <div className="bg-white dark:bg-slate-900 p-5 md:p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-4">

@@ -546,20 +546,25 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
   const selectedApp = APPS_BY_ID[step.appId];
   const events = selectedApp ? (step.type === 'trigger' ? selectedApp.triggers : selectedApp.actions) : [];
   
-  const filteredApps = useMemo(() => {
+  const filteredAppsWithEvents = useMemo(() => {
     const lowerQuery = searchQuery.toLowerCase();
-    return APPS.filter(app => {
+    return APPS.reduce((acc, app) => {
       const appEvents = step.type === 'trigger' ? app.triggers : app.actions;
-      if (appEvents.length === 0) return false;
+      if (appEvents.length === 0) return acc;
 
       const matchesApp = app.name.toLowerCase().includes(lowerQuery);
-      const matchesEvents = appEvents.some(e =>
+      const filteredEvents = appEvents.filter(e =>
         e.name.toLowerCase().includes(lowerQuery) ||
-        e.description.toLowerCase().includes(lowerQuery)
+        e.description.toLowerCase().includes(lowerQuery) ||
+        matchesApp
       );
 
-      return matchesApp || matchesEvents;
-    });
+      if (filteredEvents.length > 0 || matchesApp) {
+        acc.push({ app, filteredEvents: matchesApp && filteredEvents.length === 0 ? appEvents : filteredEvents });
+      }
+
+      return acc;
+    }, [] as { app: typeof APPS[0], filteredEvents: typeof APPS[0]['triggers'] }[]);
   }, [searchQuery, step.type]);
 
   const allEvents = APPS.flatMap(app => 
@@ -638,15 +643,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
               </div>
               
               <div className="space-y-6">
-                {filteredApps.map(app => {
-                  const appEvents = step.type === 'trigger' ? app.triggers : app.actions;
-                  const lowerQuery = searchQuery.toLowerCase();
-                  const filteredEvents = appEvents.filter(e => 
-                    e.name.toLowerCase().includes(lowerQuery) ||
-                    e.description.toLowerCase().includes(lowerQuery) ||
-                    app.name.toLowerCase().includes(lowerQuery)
-                  );
-                  
+                {filteredAppsWithEvents.map(({ app, filteredEvents }) => {
                   return (
                     <div key={app.id} className="space-y-2">
                       <button 
@@ -676,7 +673,7 @@ function StepConfigPanel({ step, allSteps, triggerStep, connections, parameters,
                   );
                 })}
                 
-                {filteredApps.length === 0 && (
+                {filteredAppsWithEvents.length === 0 && (
                   <div className="text-center py-8 text-slate-500 dark:text-slate-400 text-sm">
                     No {step.type}s found matching "{searchQuery}"
                   </div>
