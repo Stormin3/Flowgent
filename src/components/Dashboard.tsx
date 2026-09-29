@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Plus, Play, Pause, MoreVertical, Search, Zap, Clock, History, CheckCircle2, XCircle, Activity, RotateCcw, ChevronRight } from 'lucide-react';
 import { Workflow, WorkflowVersion, RunStatus } from '../data/types';
 import { APPS, APPS_BY_ID } from '../data/apps';
@@ -21,7 +21,7 @@ export function Dashboard({ workflows, onCreateNew, onEdit, onToggleActive, onRe
   const [viewingVersionsFor, setViewingVersionsFor] = useState<Workflow | null>(null);
   
   // Get a slice of recent runs using the same mock generator
-  const recentRuns = generateMockRuns().slice(0, 5);
+  const recentRuns = useMemo(() => generateMockRuns().slice(0, 5), []);
 
   const getStatusIcon = (status: RunStatus) => {
     switch (status) {

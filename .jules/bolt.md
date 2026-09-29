@@ -13,3 +13,7 @@
 ## 2026-09-27 - Optimize Inline Filtering Inside render loop
 **Learning:** In React components like `WorkflowBuilder.tsx`, `MonitoringView.tsx` and `Dashboard.tsx`, performing expensive `.filter()` and `.toLowerCase()` operations repeatedly inside the render cycle (or even worse, inside an array `.map()`) causes unnecessary performance degradation and re-renders.
 **Action:** Extract repetitive list filtering and string transformation logic into `useMemo` hooks prior to rendering, preventing repeated calculation and optimizing CPU cycles.
+
+## 2025-03-09 - Avoid Expensive Mock Data Generation in Render Loop
+**Learning:** In `Dashboard.tsx`, calling a computationally expensive mock data generator (`generateMockRuns`) and deriving from it directly in the component body caused it to execute on every render, wasting CPU cycles and potentially causing UI lag.
+**Action:** Wrap calls to computationally heavy mock or static generation functions in `useMemo` hooks (e.g., `const recentRuns = useMemo(() => generateMockRuns().slice(0, 5), []);`) to ensure they run only once.
